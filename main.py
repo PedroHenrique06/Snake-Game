@@ -53,6 +53,7 @@ class Snake(object):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 
+                
             keys = pygame.key.get_pressed()
             
             # Capta as direções através do teclado
@@ -93,8 +94,14 @@ class Snake(object):
                 else: c.move(c.dirnx, c.dirny)
     
     def reset(self, pos):
-        pass
-    
+        self.head = Cube(pos)
+        self.body = []
+        self.body.append(self.head)
+        self.turns = {}
+        self.dirnx = 0
+        self.dirny = 1
+        
+            
     def addCube(self):
         tail = self.body[-1]
         dx = tail.dirnx
@@ -157,7 +164,14 @@ def randomSnack(rows, snake):
     return(x, y)
     
 def message_box(subject, content):
-    pass
+    root = tk.Tk()
+    root.attributes("-topmost", True)
+    root.withdraw()
+    messagebox.showinfo(subject, content)
+    try:
+        root.destroy()
+    except:
+        pass
 
 
 def main(): 
@@ -178,6 +192,13 @@ def main():
         if snake.body[0].pos == snack.pos:
             snake.addCube()
             snack = Cube(randomSnack(rows, snake), color=(0, 255, 0))
+            
+        for i in range(len(snake.body)):
+            if snake.body[i].pos in list(map(lambda z:z.pos, snake.body[i+1:])):
+                print('Score: ', len(snake.body))
+                message_box('You Lost', 'Play Again...')
+                snake.reset((10, 10))
+                break 
             
         redrawWindow(window)
 
