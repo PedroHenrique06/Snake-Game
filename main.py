@@ -1,9 +1,9 @@
-import math
 import random
 import pygame
 import tkinter as tk
 from tkinter import messagebox
  
+ # Classe que corresponde aos cubos que formam a "Cobra" e os "lanches"
 class Cube(object):
     rows = 20
     w = 500
@@ -34,9 +34,8 @@ class Cube(object):
             circleMiddle2 = (i*dis+dis-radius*2, j*dis+8)
             pygame.draw.circle(surface, (0, 0, 0), circleMiddle, radius)
             pygame.draw.circle(surface, (0, 0, 0), circleMiddle2, radius)
-        
-        
-    
+
+# Classe que representa a "Cobra" do jogo        
 class Snake(object):
     body = []
     turns = {}
@@ -49,10 +48,12 @@ class Snake(object):
         self.dirny = 1
         
     def move(self):
+        
         for event in pygame.event.get():
+            # Caso a aba seja fechada o programa encerra sem falhas
             if event.type == pygame.QUIT:
                 pygame.quit()
-                
+                quit()
                 
             keys = pygame.key.get_pressed()
             
@@ -62,7 +63,7 @@ class Snake(object):
                     self.dirnx = -1
                     self.dirny = 0
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
-                    
+
                 elif keys[pygame.K_RIGHT]:
                     self.dirnx = 1
                     self.dirny = 0
@@ -77,6 +78,7 @@ class Snake(object):
                     self.dirnx = 0
                     self.dirny = 1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+        
         for i, c in enumerate(self.body):
             p = c.pos[:]
             if p in self.turns:
@@ -93,6 +95,7 @@ class Snake(object):
                 elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0], c.rows-1)
                 else: c.move(c.dirnx, c.dirny)
     
+    # Reinicia a cobra para o menor tamanho possível
     def reset(self, pos):
         self.head = Cube(pos)
         self.body = []
@@ -101,19 +104,20 @@ class Snake(object):
         self.dirnx = 0
         self.dirny = 1
         
-            
+    # Aumenta o tamanho da cobra
     def addCube(self):
         tail = self.body[-1]
         dx = tail.dirnx
         dy = tail.dirny
         
+        # Verifica a direção da cobra
         if dx == 1 and dy == 0:
             self.body.append(Cube((tail.pos[0]-1, tail.pos[1])))
         elif dx == -1 and dy == 0:
             self.body.append(Cube((tail.pos[0]+1, tail.pos[1])))
         elif dx == 0 and dy == 1:
             self.body.append(Cube((tail.pos[0], tail.pos[1]-1)))
-        if dx == 0 and dy == -1:
+        elif dx == 0 and dy == -1:
             self.body.append(Cube((tail.pos[0], tail.pos[1]+1)))
             
         self.body[-1].dirnx = dx
@@ -138,10 +142,10 @@ def drawGrid(w, rows, surface):
         x += sizeBtwn
         y += sizeBtwn
         
-        pygame.draw. line(surface, (255, 255, 255), (x, 0), (x, w))
-        pygame.draw. line(surface, (255, 255, 255), (0, y), (w, y))
+        pygame.draw.line(surface, (255, 255, 255), (x, 0), (x, w))
+        pygame.draw.line(surface, (255, 255, 255), (0, y), (w, y))
 
-# Atualiza o campo constantemente
+# Atualiza o jogo constantemente
 def redrawWindow(surface):
     global rows, width, snake, snack
     surface.fill((0, 0, 0))
@@ -150,19 +154,21 @@ def redrawWindow(surface):
     drawGrid(width, rows, surface)
     pygame.display.update()
     
-    
+# Gera um lanche em um local aleatório do campo de jogo
 def randomSnack(rows, snake):
     positions = snake.body
     
     while True:
         x = random.randrange(rows)
         y = random.randrange(rows)
+        # Verifica se a posição já está ocupada pela cobra
         if len(list(filter(lambda z:z.pos == (x, y), positions))) > 0:
             continue
         else:
             break
     return(x, y)
     
+# Gera mensagem de encerramento
 def message_box(subject, content):
     root = tk.Tk()
     root.attributes("-topmost", True)
@@ -189,10 +195,12 @@ def main():
         pygame.time.delay(50)
         clock.tick(10)   
         snake.move()
+        # Testa se a cabeça da cobra está na mesma posição que o lanche
         if snake.body[0].pos == snack.pos:
             snake.addCube()
             snack = Cube(randomSnack(rows, snake), color=(0, 255, 0))
-            
+        
+        # Testa se a cobra colidiu consigo mesma
         for i in range(len(snake.body)):
             if snake.body[i].pos in list(map(lambda z:z.pos, snake.body[i+1:])):
                 print('Score: ', len(snake.body))
@@ -201,9 +209,5 @@ def main():
                 break 
             
         redrawWindow(window)
-
-
-# cube.rows = rows
-# cube.w = w
 
 main()
