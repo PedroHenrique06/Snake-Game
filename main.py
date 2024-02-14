@@ -122,9 +122,9 @@ def drawGrid(w, rows, surface):
 
 # Atualiza o campo constantemente
 def redrawWindow(surface):
-    global rows, width, s
+    global rows, width, snake
     surface.fill((0, 0, 0))
-    s.draw(surface)
+    snake.draw(surface)
     drawGrid(width, rows, surface)
     pygame.display.update()
     
@@ -137,7 +137,7 @@ def message_box(subject, content):
 
 
 def main(): 
-    global width, rows, s
+    global width, rows, snake
     width = 500
     rows = 20
     
